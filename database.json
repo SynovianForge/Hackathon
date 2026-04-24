@@ -1,0 +1,54 @@
+{
+    "users": {
+        "string": {
+            "trust_level": 50,
+            "test_history": []
+        },
+        "intern_dave_01": {
+            "trust_level": 57,
+            "test_history": [
+                "quiz_3a046b",
+                "quiz_6beb1d"
+            ]
+        }
+    },
+    "tests": {
+        "quiz_ed9231": {
+            "commit_hash": "string",
+            "reference_answer": "sessionStorage clears when the tab closes, fixing the session hijack vulnerability.",
+            "status": "PENDING",
+            "user_id": "string"
+        },
+        "quiz_52c655": {
+            "commit_hash": "string",
+            "reference_answer": "sessionStorage clears when the tab closes, fixing the session hijack vulnerability.",
+            "status": "PENDING",
+            "user_id": "string"
+        },
+        "quiz_3523f2": {
+            "commit_hash": "string",
+            "reference_answer": "sessionStorage clears when the tab closes, fixing the session hijack vulnerability.",
+            "status": "PENDING",
+            "user_id": "string"
+        },
+        "quiz_d6a8ce": {
+            "commit_hash": "a1b2c3d4",
+            "reference_answer": "sessionStorage clears when the tab closes, fixing the session hijack vulnerability.",
+            "status": "PASS",
+            "user_id": "intern_dave_01"
+        },
+        "quiz_3a046b": {
+            "commit_hash": "z9y8x7w6",
+            "reference_answer": "sessionStorage clears when the tab closes, fixing the session hijack vulnerability.",
+            "status": "PASS",
+            "user_id": "intern_dave_01"
+        },
+        "quiz_6beb1d": {
+            "commit_hash": "a1b2c3d4",
+            "reference_answer": "auto-pass",
+            "poisoned_variable": null,
+            "status": "PASS",
+            "user_id": "intern_dave_01"
+        }
+    }
+}
