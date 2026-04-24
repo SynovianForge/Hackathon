@@ -26,8 +26,8 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   startQuizServer(workspaceRoot);
-  installGitHook(workspaceRoot, 'pre-commit');
-  vscode.window.showInformationMessage('🔒 GateKeeper is active! Pre-commit quiz enabled.');
+  installGitHook(workspaceRoot, 'pre-push');
+  vscode.window.showInformationMessage('🔒 GateKeeper is active! Pre-push quiz enabled.');
 }
 
 // ─── DEACTIVATE ───────────────────────────────────────────────────────────────
@@ -93,13 +93,21 @@ fi
   console.log(`GateKeeper: ${hookName} hook installed at ${hookPath}`);
 }
 
-// ─── GET STAGED DIFF ─────────────────────────────────────────────────────────
+// ─── GET PUSH DIFF ───────────────────────────────────────────────────────────
 function getStagedDiff(workspaceRoot: string): string {
   try {
-    return execSync('git diff --cached', { cwd: workspaceRoot }).toString().trim();
-  } catch (err) {
-    console.error('GateKeeper: Failed to get staged diff', err);
-    return '';
+    // -W: full function context so AI sees the whole picture
+    // -w: ignore whitespace-only changes (linter/formatter runs)
+    // @{u}...HEAD: aggregate diff of everything being pushed vs upstream
+    return execSync('git diff -w -W @{u}...HEAD', { cwd: workspaceRoot }).toString().trim();
+  } catch {
+    // No upstream set yet (first push) — fall back to staged changes
+    try {
+      return execSync('git diff -w -W --cached', { cwd: workspaceRoot }).toString().trim();
+    } catch (err) {
+      console.error('GateKeeper: Failed to get diff', err);
+      return '';
+    }
   }
 }
 

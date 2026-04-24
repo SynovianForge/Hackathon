@@ -2,7 +2,7 @@ venv/
 __pycache__/
 *.pyc
 .env
-*.vsix
+extension/*.vsix
 node_modules/
 extension/node_modules/
 extension/out/

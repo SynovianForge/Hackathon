@@ -4,6 +4,7 @@
   "description": "Pop quiz gatekeeper — prove you understand your code before every commit.",
   "version": "0.0.1",
   "publisher": "synovianforge",
+  "repository": "https://github.com/SynovianForge/Hackathon",
   "engines": { "vscode": "^1.80.0" },
   "activationEvents": ["onStartupFinished"],
   "main": "./out/extension.js",
