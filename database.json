@@ -10,6 +10,49 @@
                 "quiz_3a046b",
                 "quiz_6beb1d"
             ]
+        },
+        "new_intern_zero_trust": {
+            "trust_level": 51,
+            "test_history": [
+                "quiz_0b4b92"
+            ]
+        },
+        "brand_new_dev": {
+            "trust_level": 31,
+            "test_history": [
+                "quiz_607db1",
+                "quiz_2530f9",
+                "quiz_2530f9"
+            ]
+        },
+        "dev@synovianforge.com": {
+            "trust_level": 51,
+            "test_history": [
+                "quiz_97db7d"
+            ]
+        },
+        "intern-gh-username": {
+            "trust_level": 40,
+            "test_history": [
+                "quiz_f38586"
+            ]
+        },
+        "intern_1": {
+            "trust_level": 51,
+            "test_history": [
+                "quiz_4c303b"
+            ]
+        },
+        "kai@internhq.com": {
+            "trust_level": 30,
+            "test_history": [
+                "quiz_b26573",
+                "quiz_66356b"
+            ]
+        },
+        "Labib98989": {
+            "trust_level": 50,
+            "test_history": []
         }
     },
     "tests": {
@@ -119,6 +162,113 @@
             "poisoned_variable": null,
             "status": "PENDING",
             "user_id": "intern_dave_01"
+        },
+        "quiz_0b4b92": {
+            "commit_hash": "a1b2c3d4",
+            "reference_answer": "By returning early on input validation before hitting the database, the response time difference allows an attacker to distinguish between a non-existent user and a valid user with an incorrect password through timing analysis.",
+            "status": "PASS",
+            "user_id": "new_intern_zero_trust"
+        },
+        "quiz_b3ad3f": {
+            "commit_hash": "f1e2d3c4",
+            "reference_answer": "auto-pass",
+            "status": "PENDING",
+            "user_id": "brand_new_dev"
+        },
+        "quiz_607db1": {
+            "commit_hash": "f1e2d3c4",
+            "reference_answer": "The implementation lacks error handling for out-of-bounds values, causing silent payment failures. It uses a non-inclusive comparison (< 10000) and hardcodes business logic, preventing limit adjustments without a full code redeploy.",
+            "status": "PASS",
+            "user_id": "brand_new_dev"
+        },
+        "quiz_2530f9": {
+            "commit_hash": "deadbeef",
+            "reference_answer": "By switching to client-side string interpolation, you've bypassed the DB-API's parameterization. This forces the engine to re-parse every query and causes the application to crash if any input string contains a '%' character.",
+            "status": "FAIL",
+            "user_id": "brand_new_dev"
+        },
+        "quiz_b415e3": {
+            "commit_hash": "a1b2c3d",
+            "reference_answer": "auto-pass",
+            "status": "PENDING",
+            "user_id": "dev@synovianforge.com"
+        },
+        "quiz_665509": {
+            "commit_hash": "a1b2c3d",
+            "reference_answer": "auto-pass",
+            "status": "PENDING",
+            "user_id": "dev@synovianforge.com"
+        },
+        "quiz_a4ae33": {
+            "commit_hash": "a1b2c3d",
+            "reference_answer": "auto-pass",
+            "status": "PENDING",
+            "user_id": "dev@synovianforge.com"
+        },
+        "quiz_619dc8": {
+            "commit_hash": "a1b2c3d",
+            "reference_answer": "auto-pass",
+            "status": "PENDING",
+            "user_id": "dev@synovianforge.com"
+        },
+        "quiz_99d5e4": {
+            "commit_hash": "a1b2c3d",
+            "reference_answer": "auto-pass",
+            "status": "PENDING",
+            "user_id": "dev@synovianforge.com"
+        },
+        "quiz_97db7d": {
+            "commit_hash": "a1b2c3d",
+            "reference_answer": "RS256 requires a PEM/DER-encoded RSA private key. A symmetric secret lacks the specific ASN.1 metadata and mathematical components (primes, exponents) necessary for RSA, causing the library to fail during key object initialization.",
+            "status": "PASS",
+            "user_id": "dev@synovianforge.com"
+        },
+        "quiz_176362": {
+            "commit_hash": "f4e3d2c1",
+            "reference_answer": "auto-pass",
+            "status": "PENDING",
+            "user_id": "intern-gh-username"
+        },
+        "quiz_f38586": {
+            "commit_hash": "deadc0de",
+            "reference_answer": "Directly interpolating req.params.id bypasses parameterized binding, allowing raw input to be interpreted as SQL commands. This enables Union-based or Boolean-based SQL injection because the input isn't escaped before the query is executed.",
+            "status": "FAIL",
+            "user_id": "intern-gh-username"
+        },
+        "quiz_4c303b": {
+            "commit_hash": "hash1",
+            "question": "By moving to sessionStorage, you've introduced a state-isolation bug. How does this change specifically sabotage the user's ability to 'Duplicate Tab' without triggering our OAuth redirect loop? Defend this choice against our current tab-agnostic session model.",
+            "reference_answer": "sessionStorage is unique to the specific tab's browsing context and is not shared across instances. Unlike localStorage, duplicating a tab or opening a new one will return a null token, forcing a redundant and disruptive re-authentication flow.",
+            "status": "PASS",
+            "user_id": "intern_1"
+        },
+        "quiz_b26573": {
+            "commit_hash": "f7a2c91",
+            "question": "Why does your verify_password refactor allow any input to pass? Specifically, how does your failure to differentiate between the candidate and the reference in the checkpw call result in a tautological bypass?",
+            "reference_answer": "You passed stored_hash as both arguments to bcrypt.checkpw. This causes the library to verify the hash against itself, ignoring the user\u2019s password entirely and returning True for any provided string.",
+            "status": "FAIL",
+            "user_id": "kai@internhq.com"
+        },
+        "quiz_66356b": {
+            "commit_hash": "f7a2c92",
+            "question": "Explain the logic behind passing the `stored_hash` into both parameters of `checkpw`. Since the first argument expects plaintext, what does hashing a hash achieve besides ensuring a 100% login failure rate for every user?",
+            "reference_answer": "In `verify_password`, the first argument to `bcrypt.checkpw` must be the plaintext password, not the stored hash. By passing the hash into the password slot, the function attempts to validate the hash as if it were the user's input, causing an authentication failure for every login attempt.",
+            "status": "FAIL",
+            "user_id": "kai@internhq.com"
+        },
+        "quiz_66ff56": {
+            "commit_hash": "008b8ea908dad04617d2f46950e68cb343ec8eb9",
+            "question": "In auth.py, why does your verify_password implementation render the password argument useless and ensure no user can ever successfully log in?",
+            "reference_answer": "The code passes stored_hash as both the plaintext and hash arguments to bcrypt.checkpw. Since a bcrypt hash is not the plaintext representation of itself, the check will always fail, ignoring the actual user input.",
+            "status": "PENDING",
+            "user_id": "Labib98989"
+        },
+        "quiz_0a26fc": {
+            "commit_hash": "fa9b461a500ffcb3c44f10cb9c92995b75a737f5",
+            "question": "API Timeout. What does this code do?",
+            "reference_answer": "auto-pass",
+            "status": "PENDING",
+            "user_id": "Labib98989"
         }
     }
 }
