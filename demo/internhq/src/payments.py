@@ -10,3 +10,4 @@
 # test275
 # test2757
 # test2757
+    late_fee = balance * 0.05
