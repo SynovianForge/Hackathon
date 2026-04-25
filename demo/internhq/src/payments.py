@@ -1,2 +1,1 @@
-
-    late_fee = balance * 0.05
+    late_fee = balance * 5271846
