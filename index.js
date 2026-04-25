@@ -3,6 +3,7 @@ export default (app) => {
 
   const PYTHON_API_URL = process.env.PYTHON_API_URL || "http://localhost:8000";
   const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000/quiz";
+  const GITHUB_PAT = process.env.GITHUB_PAT;
 
   app.on(["pull_request.opened", "pull_request.synchronize", "pull_request.reopened"], async (context) => {
     try {
@@ -61,7 +62,24 @@ export default (app) => {
         const magicLink = `${FRONTEND_URL}?quiz_id=${data.quiz_id}&commit=${sha}`;
         const commentBody = `### 🛑 Gatekeeper Check Required\n\nYou bypassed the IDE extension.\n\n👉 **[Verify Commit](${magicLink})**`;
 
-        await context.octokit.rest.issues.createComment(context.issue({ body: commentBody }));
+        try {
+          await context.octokit.rest.issues.createComment(context.issue({ body: commentBody }));
+        } catch (commentErr) {
+          if (commentErr.status === 403 && GITHUB_PAT) {
+            app.log.warn(`⚠️ Installation token blocked (403). Falling back to PAT.`);
+            const patRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues/${prNumber}/comments`, {
+              method: 'POST',
+              headers: { 'Authorization': `token ${GITHUB_PAT}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
+              body: JSON.stringify({ body: commentBody })
+            });
+            if (!patRes.ok) {
+              const errText = await patRes.text();
+              throw new Error(`PAT comment fallback failed: ${patRes.status} ${errText}`);
+            }
+          } else {
+            throw commentErr;
+          }
+        }
         app.log.info(`🛑 Commit ${sha} pending. Magic link dropped.`);
       }
     } catch (err) {

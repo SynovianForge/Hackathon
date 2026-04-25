@@ -1,21 +1,45 @@
 #!/bin/bash
 echo "======================================================="
-echo "🧠 Waking up the Gatekeeper Brain..."
+echo "  Copypasta Hunter - Full Stack Launcher"
 echo "======================================================="
 
-# Step 1: Safety Check
+# Safety checks
 if [ ! -f "venv/bin/activate" ]; then
-    echo "❌ ERROR: Virtual environment not found!"
-    echo "Please run init_brain.sh first to set up your environment."
+    echo "ERROR: Virtual environment not found!"
+    echo "Run: python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
     exit 1
 fi
 
-# Step 2: Activate the environment
-echo "⚡ Activating Virtual Environment..."
-source venv/bin/activate
+if [ ! -d "node_modules" ]; then
+    echo "ERROR: Probot dependencies not found!"
+    echo "Run: npm install"
+    exit 1
+fi
 
-# Step 3: Launch the Server
-echo "🚀 Starting FastAPI Server on http://127.0.0.1:8000"
-echo "🛑 Press Ctrl+C to stop the server."
+if [ ! -d "frontend/node_modules" ]; then
+    echo "ERROR: Frontend dependencies not found!"
+    echo "Run: cd frontend && npm install"
+    exit 1
+fi
+
+echo ""
+echo "[1/3] Starting Python Brain on http://127.0.0.1:8000 ..."
+source venv/bin/activate
+osascript -e 'tell app "Terminal" to do script "cd \"'"$(pwd)"'\" && source venv/bin/activate && uvicorn app:app --host 0.0.0.0 --port 8000 --reload"'
+
+echo "[2/3] Starting Probot Bot on http://127.0.0.1:3000 ..."
+osascript -e 'tell app "Terminal" to do script "cd \"'"$(pwd)"'\" && npm start"'
+
+echo "[3/3] Starting Web Interrogation Room on http://localhost:3001 ..."
+osascript -e 'tell app "Terminal" to do script "cd \"'"$(pwd)"'/frontend\" && npm run dev"'
+
+echo ""
 echo "======================================================="
-uvicorn app:app --reload
+echo "  All three servers are launching in separate tabs."
+echo ""
+echo "  Brain API   : http://127.0.0.1:8000"
+echo "  Probot Bot  : http://127.0.0.1:3000"
+echo "  Web UI      : http://localhost:3001"
+echo ""
+echo "  Close the individual Terminal tabs to stop each server."
+echo "======================================================="
