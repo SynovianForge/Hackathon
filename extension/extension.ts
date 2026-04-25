@@ -405,7 +405,7 @@ function getWebviewContent(question: string, diff: string): string {
       transition: border-color 0.2s;
     }
     textarea:focus { border-color: #cba6f7; }
-    .actions { display: flex; gap: 12px; margin-top: 20px; }
+    .actions { display: flex; gap: 12px; margin-top: 16px; justify-content: center; }
     button {
       padding: 10px 24px;
       border-radius: 8px;
@@ -452,11 +452,10 @@ function getWebviewContent(question: string, diff: string): string {
     <div class="card-label">✏️ Your Answer</div>
     <textarea id="answer" placeholder="Type your answer here..." autocomplete="off" spellcheck="false"></textarea>
     <p class="hint">⚠️ Commit blocked if you skip or answer incorrectly. Copy-paste is disabled.</p>
-  </div>
-
-  <div class="actions">
-    <button class="btn-submit" id="btn-submit" onclick="submitAnswer()">Submit Answer ✅</button>
-    <button class="btn-skip" onclick="skipQuiz()">Skip (Block Commit) ❌</button>
+    <div class="actions">
+      <button class="btn-submit" id="btn-submit" onclick="submitAnswer()">Submit Answer ✅</button>
+      <button class="btn-skip" onclick="skipQuiz()">Skip (Block Commit) ❌</button>
+    </div>
   </div>
 
   <script>
