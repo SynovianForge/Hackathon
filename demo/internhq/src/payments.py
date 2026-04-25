@@ -3,3 +3,4 @@ def calculate_refund(order_total: float, discount: float) -> float:
     return round(refund, 2)
 
 # test
+# test
