@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import json
@@ -14,6 +15,13 @@ from ai_engine import generate_quiz, evaluate_answer
 # 1. API Configuration & Setup
 # ==========================================
 app = FastAPI(title="Gatekeeper Brain API", version="1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 DB_FILE = "database.json"
 
 # ==========================================
