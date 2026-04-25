@@ -81,6 +81,52 @@ export default (app) => {
           }
         }
         app.log.info(`🛑 Commit ${sha} pending. Magic link dropped.`);
+
+        // Poll the DB until the quiz is answered or we time out (5 minutes)
+        const pollInterval = 5000;
+        const maxAttempts = 60;
+        let attempts = 0;
+
+        const poll = async () => {
+          if (attempts >= maxAttempts) {
+            await context.octokit.rest.repos.createCommitStatus({
+              owner, repo, sha, state: "failure",
+              context: "Gatekeeper Verification",
+              description: "Quiz timed out — not answered within 5 minutes."
+            });
+            app.log.warn(`⏰ Quiz ${data.quiz_id} timed out.`);
+            return;
+          }
+
+          attempts++;
+          try {
+            const quizRes = await fetch(`${PYTHON_API_URL}/api/quiz/${data.quiz_id}`);
+            const quiz = await quizRes.json();
+
+            if (quiz.status === 'PASS') {
+              await context.octokit.rest.repos.createCommitStatus({
+                owner, repo, sha, state: "success",
+                context: "Gatekeeper Verification",
+                description: "Quiz passed. Commit verified."
+              });
+              app.log.info(`✅ Quiz ${data.quiz_id} passed. Commit ${sha} unlocked.`);
+            } else if (quiz.status === 'FAIL') {
+              await context.octokit.rest.repos.createCommitStatus({
+                owner, repo, sha, state: "failure",
+                context: "Gatekeeper Verification",
+                description: "Quiz failed. Commit blocked."
+              });
+              app.log.info(`❌ Quiz ${data.quiz_id} failed. Commit ${sha} blocked.`);
+            } else {
+              setTimeout(poll, pollInterval);
+            }
+          } catch (pollErr) {
+            app.log.error(`Poll error: ${pollErr.message}`);
+            setTimeout(poll, pollInterval);
+          }
+        };
+
+        setTimeout(poll, pollInterval);
       }
     } catch (err) {
       app.log.error(`🚨 CRASH LOG: ${err.message}`);
