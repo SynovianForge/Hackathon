@@ -10,3 +10,4 @@
 # test275
 # test2757
 # test2757
+    return balance * 1.05
