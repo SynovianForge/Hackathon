@@ -43,13 +43,13 @@ function startQuizServer(workspaceRoot: string) {
 
       if (!diff) {
         res.writeHead(200);
-        res.end('0');
+        res.end('PASS:No code changes detected — push allowed.');
         return;
       }
 
       triggerQuiz(diff, workspaceRoot)
-        .then(passed => { res.writeHead(200); res.end(passed ? '0' : '1'); })
-        .catch(() => { res.writeHead(200); res.end('1'); });
+        .then(({ passed, message }) => { res.writeHead(200); res.end(`${passed ? 'PASS' : 'FAIL'}:${message}`); })
+        .catch(() => { res.writeHead(200); res.end('FAIL:Extension error — push blocked.'); });
     } else {
       res.writeHead(404);
       res.end('Not found');
@@ -80,11 +80,14 @@ function installGitHook(workspaceRoot: string, hookName: 'pre-commit' | 'pre-pus
 # Do not edit manually.
 
 RESPONSE=$(curl -s --max-time 90 http://127.0.0.1:${PORT}/trigger-quiz)
+STATUS=$(echo "$RESPONSE" | cut -d: -f1)
+MESSAGE=$(echo "$RESPONSE" | cut -d: -f2-)
 
-if [ "$RESPONSE" = "0" ]; then
+if [ "$STATUS" = "PASS" ]; then
+  echo "✅ GateKeeper: $MESSAGE"
   exit 0
 else
-  echo "❌ GateKeeper: Quiz failed or not answered. Commit blocked."
+  echo "❌ GateKeeper: $MESSAGE"
   exit 1
 fi
 `;
@@ -112,14 +115,14 @@ function getStagedDiff(workspaceRoot: string): string {
 }
 
 // ─── TRIGGER QUIZ ─────────────────────────────────────────────────────────────
-function triggerQuiz(diff: string, workspaceRoot: string): Promise<boolean> {
+function triggerQuiz(diff: string, workspaceRoot: string): Promise<{passed: boolean, message: string}> {
   return new Promise(async (resolve) => {
     vscode.window.showInformationMessage('🔒 GateKeeper: Checking your push...');
     const quizData = await generateQuestion(diff, workspaceRoot);
 
     // Backend returned an early PASS (trust level, diff too large, etc.) — no quiz needed
     if (quizData === null) {
-      resolve(true);
+      resolve({ passed: true, message: 'Trust level passed — no quiz needed.' });
       return;
     }
 
@@ -144,7 +147,7 @@ function triggerQuiz(diff: string, workspaceRoot: string): Promise<boolean> {
         vscode.window.showErrorMessage(
           '🚫 GateKeeper: Commit blocked — focus violation detected. Do not switch windows or tabs during the quiz.'
         );
-        resolve(false);
+        resolve({ passed: false, message: 'Focus violation — push blocked.' });
         return;
       }
 
@@ -158,18 +161,18 @@ function triggerQuiz(diff: string, workspaceRoot: string): Promise<boolean> {
 
         if (passed) {
           vscode.window.showInformationMessage('✅ GateKeeper: Correct! Commit allowed.');
+          resolve({ passed: true, message: 'Correct answer — push allowed.' });
         } else {
           vscode.window.showErrorMessage('❌ GateKeeper: Wrong answer. Commit blocked!');
+          resolve({ passed: false, message: 'Wrong answer — push blocked.' });
         }
-
-        resolve(passed);
       }
     });
 
     // Only fires if user closes the panel WITHOUT answering
     panel.onDidDispose(() => {
       if (!answered) {
-        resolve(false);
+        resolve({ passed: false, message: 'Quiz closed without answering — push blocked.' });
       }
     });
   });
@@ -220,7 +223,7 @@ function parseDiff(rawDiff: string, workspaceRoot: string): { files: FileDiff[],
 }
 
 // ─── API: GENERATE QUESTION ───────────────────────────────────────────────────
-async function generateQuestion(diff: string, workspaceRoot: string): Promise<{ question: string, quiz_id: string, user_id: string } | null> {
+async function generateQuestion(diff: string, workspaceRoot: string): Promise<{ question: string, quiz_id: string, user_id: string, reason?: string } | null> {
   const { files, total_diff_size } = parseDiff(diff, workspaceRoot);
   const user_id = getGitUser(workspaceRoot);
   const commit_hash = getCommitHash(workspaceRoot);
@@ -234,11 +237,11 @@ async function generateQuestion(diff: string, workspaceRoot: string): Promise<{ 
 
     if (!response.ok) { throw new Error(`API ${response.status}`); }
 
-    const data = await response.json() as { action: string, question?: string, quiz_id?: string, message?: string };
+    const data = await response.json() as { action: string, question?: string, quiz_id?: string, message?: string, reason?: string };
 
     if (data.action === 'PASS') { return null; }
 
-    return { question: data.question ?? '', quiz_id: data.quiz_id ?? '', user_id };
+    return { question: data.question ?? '', quiz_id: data.quiz_id ?? '', user_id, reason: data.reason };
   } catch (err) {
     console.error('GateKeeper: check-push failed', err);
     return { question: 'Backend unreachable. What does this commit do?', quiz_id: '', user_id };
