@@ -19,10 +19,4 @@ def api_register(body: dict):
         raise HTTPException(status_code=400, detail=result["error"])
     return {"message": "Account created successfully"}
 
-@app.get("/me")
-def get_me(authorization: str = Header(...)):
-    token = authorization.replace("Bearer ", "")
-    payload = validate_token(token)
-    if not payload:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-    return {"user_id": payload["user_id"], "role": payload["role"]}
+
