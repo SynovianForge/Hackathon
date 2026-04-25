@@ -25,7 +25,7 @@ fi
 echo ""
 echo "[1/3] Starting Python Brain on http://127.0.0.1:8000 ..."
 source venv/bin/activate
-osascript -e 'tell app "Terminal" to do script "cd \"'"$(pwd)"'\" && source venv/bin/activate && uvicorn app:app --host 0.0.0.0 --port 8000 --reload"'
+osascript -e 'tell app "Terminal" to do script "cd \"'"$(pwd)"'\" && source venv/bin/activate && uvicorn app:app --host 0.0.0.0 --port 8000"'
 
 echo "[2/3] Starting Probot Bot on http://127.0.0.1:3000 ..."
 osascript -e 'tell app "Terminal" to do script "cd \"'"$(pwd)"'\" && npm start"'

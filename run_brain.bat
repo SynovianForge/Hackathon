@@ -28,7 +28,7 @@ if not exist frontend\node_modules (
 echo.
 echo [1/3] Starting Python Brain on http://127.0.0.1:8000 ...
 call venv\Scripts\activate
-start "Gatekeeper Brain" cmd /k "call venv\Scripts\activate && uvicorn app:app --host 0.0.0.0 --port 8000 --reload"
+start "Gatekeeper Brain" cmd /k "call venv\Scripts\activate && uvicorn app:app --host 0.0.0.0 --port 8000"
 
 echo [2/3] Starting Probot Bot on http://127.0.0.1:3000 ...
 start "Copypasta Hunter Bot" cmd /k "npm start"
